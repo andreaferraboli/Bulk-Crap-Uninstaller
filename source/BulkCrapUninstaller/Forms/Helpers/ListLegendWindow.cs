@@ -19,6 +19,7 @@ namespace BulkCrapUninstaller.Forms
         public ListLegendWindow()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             listLegend1.CloseRequested += (sender, args) =>
             {

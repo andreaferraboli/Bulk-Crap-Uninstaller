@@ -17,7 +17,7 @@ namespace Klocman.Forms
         public OverlaySplashScreen(Form owner, Image shownImage) : this()
         {
             _owner = owner;
-            startupSplashPictureBox.Image = shownImage;
+            startupSplashPictureBox.Image = Theming.ThemeManager.GetThemedImage(shownImage);
             Icon = _owner.Icon;
 
             Location = _owner.PointToScreen(Point.Empty);
@@ -31,6 +31,7 @@ namespace Klocman.Forms
         private OverlaySplashScreen()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
         }
 
         /// <summary>

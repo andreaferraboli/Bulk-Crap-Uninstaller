@@ -31,6 +31,7 @@ namespace Klocman.Forms
             ForeColor = SystemColors.WindowText;
 
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             StartPosition = settings.StartPosition;
 

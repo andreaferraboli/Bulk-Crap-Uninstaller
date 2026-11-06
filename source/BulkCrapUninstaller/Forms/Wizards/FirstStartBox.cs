@@ -25,6 +25,7 @@ namespace BulkCrapUninstaller.Forms
         public FirstStartBox(bool canExit)
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             if (DesignMode) return;
 

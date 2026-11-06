@@ -25,6 +25,7 @@ namespace BulkCrapUninstaller.Forms
         public PropertiesWindow()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             Icon = Resources.Icon_Logo;
 

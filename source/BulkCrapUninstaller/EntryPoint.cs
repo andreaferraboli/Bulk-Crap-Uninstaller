@@ -13,6 +13,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using BulkCrapUninstaller.Forms;
+using BulkCrapUninstaller.Functions.Tools;
+using Klocman.Forms.Theming;
 using Klocman;
 using Klocman.Extensions;
 using Klocman.Forms;
@@ -59,6 +61,11 @@ namespace BulkCrapUninstaller
                     }
 
                     SetupDependancies();
+
+                    // The old "use system theme" option keeps the classic look and disables the modern theme
+                    ThemeManager.Initialize(Properties.Settings.Default.WindowTheme,
+                        !Properties.Settings.Default.WindowUseSystemTheme);
+                    ObjectListViewTheme.Register();
 
                     if(Properties.Settings.Default.WindowDpiAware)
                         Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);

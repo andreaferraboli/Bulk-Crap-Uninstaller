@@ -16,6 +16,7 @@ namespace Klocman.Forms
         private WindowTargeterDialog()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             windowTargeter1.WindowSelected += OnWindowSelected;
         }

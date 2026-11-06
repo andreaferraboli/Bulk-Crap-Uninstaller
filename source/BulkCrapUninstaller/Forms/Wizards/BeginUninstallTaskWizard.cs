@@ -26,6 +26,7 @@ namespace BulkCrapUninstaller.Forms
         public BeginUninstallTaskWizard()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             Icon = MessageBoxes.DefaultOwner.Icon;
             DialogResult = DialogResult.Cancel;

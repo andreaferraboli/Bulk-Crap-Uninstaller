@@ -37,6 +37,7 @@ namespace BulkCrapUninstaller.Forms
         public JunkRemoveWindow(IEnumerable<IJunkResult> junk)
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             Icon = Resources.Icon_Logo;
 

@@ -26,6 +26,7 @@ namespace BulkCrapUninstaller.Forms
         public TargetWindow()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             fileTargeter1.DirectoriesSelected += DirectoryTargeterDirectoriesSelected;
             windowTargeter1.PickingStarted += WindowTargeter1OnPickingStarted;

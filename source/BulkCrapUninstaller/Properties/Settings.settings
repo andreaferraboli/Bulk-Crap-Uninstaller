@@ -44,6 +44,9 @@
     <Setting Name="WindowUseSystemTheme" Provider="PortableSettingsProvider.PortableSettingsProvider" Roaming="true" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="WindowTheme" Provider="PortableSettingsProvider.PortableSettingsProvider" Roaming="true" Type="Klocman.Forms.Theming.ThemeMode" Scope="User">
+      <Value Profile="(Default)">Dark</Value>
+    </Setting>
     <Setting Name="FilterShowProtected" Provider="PortableSettingsProvider.PortableSettingsProvider" Roaming="true" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>

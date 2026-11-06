@@ -23,6 +23,7 @@ namespace Klocman.Forms
         internal LoadingDialog(string title, Action<LoadingDialogInterface> action)
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             Text = title;
             label1.Text = title;

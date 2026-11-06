@@ -33,6 +33,7 @@ namespace BulkCrapUninstaller.Forms
             _appUninstaller = appUninstaller;
 
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             if (DesignMode) return;
 

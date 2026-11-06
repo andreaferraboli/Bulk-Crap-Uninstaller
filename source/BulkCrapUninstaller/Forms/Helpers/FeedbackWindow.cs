@@ -13,6 +13,7 @@ namespace BulkCrapUninstaller.Forms
         public FeedbackWindow()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
             webBrowser.DocumentCompleted += webBrowser_DocumentCompleted;
             webBrowser.ScrollBarsEnabled = false;
             //webBrowser.Visible = false;

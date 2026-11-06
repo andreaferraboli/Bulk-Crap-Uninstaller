@@ -12,6 +12,7 @@ using BulkCrapUninstaller.Functions;
 using BulkCrapUninstaller.Properties;
 using Klocman;
 using Klocman.Binding.Settings;
+using Klocman.Forms.Theming;
 using Klocman.Forms.Tools;
 using Klocman.Localising;
 
@@ -28,6 +29,7 @@ namespace BulkCrapUninstaller.Forms
         public SettingsWindow()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -99,14 +101,114 @@ namespace BulkCrapUninstaller.Forms
 
             _settings.SendUpdates(this);
 
+            AddThemeSelector();
+
             _restartNeeded = false;
         }
+
+        #region Color theme
+
+        private ComboBox _comboBoxTheme;
+        private bool _themeRestartNeeded;
+
+        /// <summary>
+        /// Index of the theme that is currently in use: 0 dark, 1 light, 2 follow Windows, 3 classic (no theme)
+        /// </summary>
+        private static int RunningThemeIndex => ThemeManager.IsActive ? (int)ThemeManager.Mode : 3;
+
+        private static int SelectedThemeIndex(Settings s) => s.WindowUseSystemTheme ? 3 : (int)s.WindowTheme;
+
+        /// <summary>
+        /// Adds the color theme selector to the Misc group, laid out like the double click selector below it.
+        /// </summary>
+        private void AddThemeSelector()
+        {
+            var texts = GetThemeTexts();
+
+            var panel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Margin = panel5.Margin,
+                Padding = panel5.Padding,
+                Name = "panelTheme"
+            };
+            _comboBoxTheme = new ComboBox
+            {
+                Dock = DockStyle.Right,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                FormattingEnabled = true,
+                Width = comboBoxDoubleClick.Width,
+                Name = "comboBoxTheme"
+            };
+            _comboBoxTheme.Items.AddRange(new object[] { texts[1], texts[2], texts[3], texts[4] });
+            var label = new Label
+            {
+                AutoSize = true,
+                Dock = DockStyle.Left,
+                Margin = label3.Margin,
+                Padding = label3.Padding,
+                Text = texts[0],
+                Name = "labelTheme"
+            };
+            panel.Controls.Add(_comboBoxTheme);
+            panel.Controls.Add(label);
+            panel.Height = panel5.Height;
+
+            groupBoxMisc.SuspendLayout();
+            groupBoxMisc.Controls.Add(panel);
+            groupBoxMisc.ResumeLayout(true);
+
+            var index = SelectedThemeIndex(_settings.Settings);
+            _comboBoxTheme.SelectedIndex = Math.Max(0, Math.Min(3, index));
+            _comboBoxTheme.SelectedIndexChanged += ComboBoxTheme_SelectedIndexChanged;
+        }
+
+        private void ComboBoxTheme_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var index = _comboBoxTheme.SelectedIndex;
+            if (index < 0) return;
+
+            if (index == 3)
+            {
+                _settings.Settings.WindowUseSystemTheme = true;
+            }
+            else
+            {
+                _settings.Settings.WindowTheme = (ThemeMode)index;
+                _settings.Settings.WindowUseSystemTheme = false;
+            }
+
+            // The theme is applied when windows are created, so a restart is needed to see the change
+            _themeRestartNeeded = index != RunningThemeIndex;
+        }
+
+        /// <summary>
+        /// Label and option names (label, dark, light, follow Windows, classic). Kept out of the resource files.
+        /// </summary>
+        private static string[] GetThemeTexts()
+        {
+            switch (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)
+            {
+                case "it":
+                    return new[] { "Tema colori:", "Scuro", "Chiaro", "Segui Windows", "Classico (senza tema)" };
+                case "de":
+                    return new[] { "Farbschema:", "Dunkel", "Hell", "Wie Windows", "Klassisch (ohne Design)" };
+                case "fr":
+                    return new[] { "Thème de couleurs :", "Sombre", "Clair", "Suivre Windows", "Classique (sans thème)" };
+                case "es":
+                    return new[] { "Tema de color:", "Oscuro", "Claro", "Seguir a Windows", "Clásico (sin tema)" };
+                default:
+                    return new[] { "Color theme:", "Dark", "Light", "Follow Windows", "Classic (no theme)" };
+            }
+        }
+
+        #endregion
 
         private void button2_Click(object sender, EventArgs e)
         {
             Close();
 
-            if (_restartNeeded && MessageBoxes.RestartNeededForSettingChangeQuestion())
+            if ((_restartNeeded || _themeRestartNeeded) && MessageBoxes.RestartNeededForSettingChangeQuestion())
             {
                 EntryPoint.Restart();
             }

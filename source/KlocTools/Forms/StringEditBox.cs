@@ -14,6 +14,7 @@ namespace Klocman.Forms
         public StringEditBox()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
         }
 
         public static bool ShowDialog(string description, string title, string defaultText,

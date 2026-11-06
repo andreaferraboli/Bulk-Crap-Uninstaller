@@ -21,6 +21,7 @@ namespace BulkCrapUninstaller.Forms
         private CustomNoteDialog()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
         }
     }
 }

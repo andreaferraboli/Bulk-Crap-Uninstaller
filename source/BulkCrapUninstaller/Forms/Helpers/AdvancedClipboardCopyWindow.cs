@@ -17,6 +17,7 @@ namespace BulkCrapUninstaller.Forms
         private AdvancedClipboardCopyWindow()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
         }
 
         public static void ShowDialog(Form parent, IEnumerable<ApplicationUninstallerEntry> targets)

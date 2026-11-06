@@ -14,6 +14,7 @@ using Klocman.Events;
 using Klocman.Extensions;
 using Klocman.Forms;
 using Klocman.Forms.Tools;
+using Klocman.Forms.Theming;
 using Klocman.IO;
 using Klocman.Native;
 using Klocman.Subsystems;
@@ -78,6 +79,13 @@ namespace BulkCrapUninstaller.Forms
             Application.DoEvents();
 
             InitializeComponent();
+            ThemeManager.Attach(this);
+            if (ThemeManager.IsActive)
+            {
+                splitContainer1.Panel1.BackColor = ThemeManager.Palette.Sidebar;
+                treeMap1.GapColor = ThemeManager.Palette.Background;
+                treeMap1.SelectionColor = ThemeManager.Palette.Accent;
+            }
 
             // Setup settings
             _setMan = new SettingTools(Settings.Default.SettingBinder, this);
@@ -86,10 +94,12 @@ namespace BulkCrapUninstaller.Forms
 
             // Finish up setting controls and window, suspend after settings have loaded
             SuspendLayout();
-            ToolStripManager.Renderer = new ToolStripProfessionalRenderer(new StandardSystemColorTable())
-            {
-                RoundedEdges = true
-            };
+            // The modern theme installs its own renderer
+            if (!ThemeManager.IsActive)
+                ToolStripManager.Renderer = new ToolStripProfessionalRenderer(new StandardSystemColorTable())
+                {
+                    RoundedEdges = true
+                };
 
             // Disable until the first list refresh finishes
             LockApplication(true);
@@ -169,6 +179,13 @@ namespace BulkCrapUninstaller.Forms
             Console.WriteLine(MainTitleBarText);
 
             _styleController = new WindowStyleController(this);
+
+            // Switching between the classic and the modern look needs a restart
+            useSystemThemeToolStripMenuItem.Click += (sender, args) =>
+            {
+                if (useSystemThemeToolStripMenuItem.Checked == ThemeManager.IsActive && MessageBoxes.RestartNeededForSettingChangeQuestion())
+                    EntryPoint.Restart();
+            };
 
             // Initialize the status bar
             toolStripLabelStatus_TextChanged(this, EventArgs.Empty);
@@ -592,7 +609,7 @@ namespace BulkCrapUninstaller.Forms
                 x => x.ToolbarsShowSettings, this);
             settings.Subscribe((x, y) => toolStrip.Visible = y.NewValue,
                 x => x.ToolbarsShowToolbar, this);
-            settings.Subscribe((x, y) => _styleController.SetStyles(y.NewValue),
+            settings.Subscribe((x, y) => { if (!ThemeManager.IsActive) _styleController.SetStyles(y.NewValue); },
                 x => x.WindowUseSystemTheme, this);
             settings.Subscribe((x, y) => statusStrip1.Visible = y.NewValue,
                 x => x.ToolbarsShowStatusbar, this);

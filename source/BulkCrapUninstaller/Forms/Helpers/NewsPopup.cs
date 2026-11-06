@@ -15,6 +15,7 @@ namespace BulkCrapUninstaller.Forms
         private NewsPopup()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             if (DesignMode) return;
 

@@ -29,6 +29,7 @@ namespace UninstallTools.Dialogs
         private StartupManagerWindow()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             comboBoxFilter.SelectedIndex = 0;
 

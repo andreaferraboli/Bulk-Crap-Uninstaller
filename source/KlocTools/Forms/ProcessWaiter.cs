@@ -13,6 +13,7 @@ namespace Klocman.Forms
         private ProcessWaiter()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             processWaiterControl1.AllProcessesClosed += ProcessWaiterControl1_AllProcessesClosed;
             processWaiterControl1.CancelClicked += ProcessWaiterControl1_CancelClicked;

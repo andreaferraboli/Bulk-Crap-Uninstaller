@@ -32,6 +32,7 @@ namespace BulkCrapUninstaller.Forms
         private FeedbackBox()
         {
             InitializeComponent();
+            Klocman.Forms.Theming.ThemeManager.Attach(this);
 
             if (DesignMode) return;
 
