@@ -42,6 +42,15 @@ namespace BulkCrapUninstaller.Functions.ApplicationList
             _iconGetter = new UninstallerIconGetter();
             _reference.olvColumnDisplayName.ImageGetter = _iconGetter.ColumnImageGetter;
 
+            // Modern theme: tall rows with 32px icons (classic look keeps the compact 16px rows)
+            BulkCrapUninstaller.Functions.Tools.ObjectListViewTheme.UseModernRows(
+                reference.uninstallerObjectListView, reference.olvColumnDisplayName,
+                (imageSize, iconBounds) =>
+                {
+                    _iconGetter.ImageSize = imageSize;
+                    _iconGetter.IconBounds = iconBounds;
+                });
+
             // Refresh items marked as invalid after corresponding setting change
             _settings.Subscribe((x, y) =>
             {

@@ -28,6 +28,88 @@ namespace BulkCrapUninstaller.Functions.Tools
 
         private static ThemePalette P => ThemeManager.Palette;
 
+        /// <summary>
+        ///     Tall rows with large icons (modern uninstaller look): bigger program name, muted secondary
+        ///     columns, everything vertically centered. Does nothing when the theme is not active, so the
+        ///     classic look keeps its compact rows.
+        /// </summary>
+        /// <param name="olv">List to style</param>
+        /// <param name="nameColumn">Column showing the program name and icon</param>
+        /// <param name="iconLayoutChanged">
+        ///     Receives the size of the images the icon list should use and the bounds of the icon inside
+        ///     each image (the rest is transparent padding). Called now and again when the DPI changes.
+        /// </param>
+        public static void UseModernRows(ObjectListView olv, OLVColumn nameColumn, Action<Size, Rectangle> iconLayoutChanged)
+        {
+            if (!ThemeManager.IsActive) return;
+
+            Font nameFont = null;
+
+            void UpdateLayout()
+            {
+                var dpi = olv.DeviceDpi;
+                int S(float px) => (int)Math.Round(px * dpi / 96f);
+
+                // Old fonts are not disposed, rows formatted earlier may still reference them
+                nameFont = CreateNameFont(olv.Font);
+
+                var iconSize = S(32);
+                var rowHeight = Math.Max(S(46), Math.Max(nameFont.Height, olv.Font.Height) + S(14));
+                // The images carry the padding: a small gap before the icon (after the check box) and a wider
+                // one before the program name. Full row height so the list doesn't have to resize every image.
+                var imageSize = new Size(S(2) + iconSize + S(10), rowHeight);
+                var iconBounds = new Rectangle(S(2), (rowHeight - iconSize) / 2, iconSize, iconSize);
+
+                olv.CellPadding = new Rectangle(S(8), 0, S(8), 0);
+                olv.CellVerticalAlignment = StringAlignment.Center;
+                olv.HeaderMinimumHeight = S(36);
+
+                iconLayoutChanged?.Invoke(imageSize, iconBounds);
+                olv.RowHeight = rowHeight;
+                olv.Invalidate();
+            }
+
+            UpdateLayout();
+            olv.DpiChangedAfterParent += (_, _) => UpdateLayout();
+            olv.FontChanged += (_, _) => UpdateLayout();
+
+            olv.UseCellFormatEvents = true;
+            olv.FormatCell += (_, e) =>
+            {
+                if (e.Column == nameColumn)
+                {
+                    e.SubItem.Font = nameFont;
+                    return;
+                }
+
+                // Only mute text that uses the default color, keep any custom colors
+                var fore = e.SubItem.ForeColor;
+                if (!fore.IsEmpty && fore.ToArgb() != olv.ForeColor.ToArgb()) return;
+
+                var muted = P.TextMuted;
+                var back = e.SubItem.BackColor;
+                if (!back.IsEmpty && back.ToArgb() != P.ListBackground.ToArgb())
+                    muted = ThemeManager.EnsureContrast(muted, back, 3.5);
+                e.SubItem.ForeColor = muted;
+            };
+        }
+
+        /// <summary>
+        ///     Program name font: about 1.5pt larger than the list font, semibold when using Segoe UI.
+        /// </summary>
+        private static Font CreateNameFont(Font baseFont)
+        {
+            var size = baseFont.Size * (1f + 1.5f / 9f);
+            if (baseFont.Name.Equals("Segoe UI", StringComparison.OrdinalIgnoreCase))
+            {
+                var semibold = new Font("Segoe UI Semibold", size, baseFont.Style & ~FontStyle.Bold, baseFont.Unit);
+                if (semibold.Name.Equals("Segoe UI Semibold", StringComparison.OrdinalIgnoreCase))
+                    return semibold;
+                semibold.Dispose();
+            }
+            return new Font(baseFont.FontFamily, size, baseFont.Style, baseFont.Unit);
+        }
+
         private static bool Style(Control c)
         {
             if (c is not ObjectListView olv) return false;
@@ -103,7 +185,15 @@ namespace BulkCrapUninstaller.Functions.Tools
                 g.DrawLine(pen, r.Right - 1, r.Top + pad, r.Right - 1, r.Bottom - pad);
             }
 
-            var textRect = Rectangle.FromLTRB(r.Left + (int)S(columnIndex == 0 ? 8 : 6), r.Top, r.Right - (int)S(6), r.Bottom);
+            var padLeft = (int)S(columnIndex == 0 ? 8 : 6);
+            var padRight = (int)S(6);
+            // Line the header text up with the cell text when the list uses cell padding
+            if (olv?.CellPadding is { } cellPadding)
+            {
+                padLeft = cellPadding.X + (columnIndex == 0 ? 3 : 0);
+                padRight = cellPadding.Width;
+            }
+            var textRect = Rectangle.FromLTRB(r.Left + padLeft, r.Top, r.Right - padRight, r.Bottom);
 
             // Sort chevron
             if (olv != null && olv.ShowSortIndicators && olv.PrimarySortColumn == column &&
