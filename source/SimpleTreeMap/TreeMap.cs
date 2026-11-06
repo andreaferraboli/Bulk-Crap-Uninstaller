@@ -53,8 +53,37 @@ namespace SimpleTreeMap
         private List<SliceRectangle<object>> _rectangles;
         private HashSet<object> _selectedObjects;
         private SliceRectangle<object> _currentHoveredRectangle;
-        private static readonly SolidBrush SelectedRectBrush = new(Color.DodgerBlue);
+        private SolidBrush _selectedRectBrush = new(Color.DodgerBlue);
+        private SolidBrush _gapBrush = new(Color.Black);
         readonly Dictionary<Color, Brush> _brushCache = new();
+
+        /// <summary>
+        /// Color of the lines between slices.
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Color GapColor
+        {
+            get => _gapBrush.Color;
+            set
+            {
+                _gapBrush = new SolidBrush(value);
+                Invalidate();
+            }
+        }
+
+        /// <summary>
+        /// Color of selected slices.
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Color SelectionColor
+        {
+            get => _selectedRectBrush.Color;
+            set
+            {
+                _selectedRectBrush = new SolidBrush(value);
+                Invalidate();
+            }
+        }
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [ReadOnly(true)]
@@ -169,7 +198,7 @@ namespace SimpleTreeMap
             //var font = new Font("Arial", 8);
             var gfx = e.Graphics;
 
-            gfx.FillRectangle(new SolidBrush(Color.Black), ClientRectangle);
+            gfx.FillRectangle(_gapBrush, ClientRectangle);
 
             if (_rectangles == null)
             {
@@ -184,7 +213,7 @@ namespace SimpleTreeMap
                     continue;
 
                 if (_selectedObjects != null && r.Slice.Elements.Any(x => _selectedObjects.Contains(x.Object)))
-                    gfx.FillRectangle(SelectedRectBrush, r.PaintRect);
+                    gfx.FillRectangle(_selectedRectBrush, r.PaintRect);
                 else
                     gfx.FillRectangle(_brushCache[r.Slice.Elements.First().Color], r.PaintRect);
 

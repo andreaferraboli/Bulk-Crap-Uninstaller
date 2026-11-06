@@ -263,6 +263,17 @@ namespace BrightIdeasSoftware {
     [Browsable(true),
      ToolboxItem(true)]
     public class BaseRenderer : AbstractRenderer {
+        /// <summary>
+        /// Optional replacement for the visual-style check box drawing (used for theming).
+        /// Arguments: graphics, check box bounds, state, enabled. Return true if the box was drawn.
+        /// </summary>
+        public static Func<Graphics, Rectangle, CheckState, bool, bool> CheckBoxPainter { get; set; }
+
+        /// <summary>
+        /// Optional mapping applied to row and cell text colors (not selected rows), used for theming.
+        /// </summary>
+        public static Func<Color, Color> ForegroundColorFilter { get; set; }
+
         internal const TextFormatFlags NormalTextFormatFlags = TextFormatFlags.NoPrefix |
                                                                TextFormatFlags.EndEllipsis |
                                                                TextFormatFlags.PreserveGraphicsTranslateTransform;
@@ -956,7 +967,8 @@ namespace BrightIdeasSoftware {
                 (ColumnIsPrimary || ListView.FullRowSelect)) 
                 return GetSelectedForegroundColor();
 
-            return SubItem == null || ListItem.UseItemStyleForSubItems ? ListItem.ForeColor : SubItem.ForeColor;
+            var foreColor = SubItem == null || ListItem.UseItemStyleForSubItems ? ListItem.ForeColor : SubItem.ForeColor;
+            return ForegroundColorFilter == null ? foreColor : ForegroundColorFilter(foreColor);
         }
 
         /// <summary>
@@ -1475,6 +1487,10 @@ namespace BrightIdeasSoftware {
 
                 return DrawImage(g, new Rectangle(checkBoxLocation, checkBoxSize), ListView.StateImageList.Images[imageIndex]) + 4;
             }
+
+            if (CheckBoxPainter != null &&
+                CheckBoxPainter(g, new Rectangle(checkBoxLocation, checkBoxSize), ListItem.CheckState, ListItem.Enabled))
+                return checkBoxSize.Width;
 
             CheckBoxState boxState = GetCheckBoxState(ListItem.CheckState);
             CheckBoxRenderer.DrawCheckBox(g, checkBoxLocation, boxState);
@@ -2318,7 +2334,8 @@ namespace BrightIdeasSoftware {
                 DrawAlignedImage(g, r, ImageListOrDefault.Images[key]);
             } else {
                 r = CalculateCheckBoxBounds(g, r);
-                CheckBoxRenderer.DrawCheckBox(g, r.Location, GetCheckBoxState(state));
+                if (CheckBoxPainter == null || !CheckBoxPainter(g, r, state, ListItem.Enabled))
+                    CheckBoxRenderer.DrawCheckBox(g, r.Location, GetCheckBoxState(state));
             }
         }
 
