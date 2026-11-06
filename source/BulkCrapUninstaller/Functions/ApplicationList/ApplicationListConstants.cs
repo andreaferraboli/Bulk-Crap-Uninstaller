@@ -6,13 +6,16 @@
 using System.Drawing;
 using BulkCrapUninstaller.Properties;
 using Klocman.Resources;
+using Klocman.Forms.Theming;
 using UninstallTools;
 
 namespace BulkCrapUninstaller.Functions.ApplicationList
 {
     internal static class ApplicationListConstants
     {
-        public static ApplicationListColors Colors => Settings.Default.MiscColorblind ? ApplicationListColors.ColorBlind : ApplicationListColors.Normal;
+        public static ApplicationListColors Colors => ThemeManager.IsDark
+            ? (Settings.Default.MiscColorblind ? ApplicationListColors.ColorBlindDark : ApplicationListColors.NormalDark)
+            : (Settings.Default.MiscColorblind ? ApplicationListColors.ColorBlind : ApplicationListColors.Normal);
 
         public static string GetApplicationCertificateText(ApplicationUninstallerEntry entry)
         {
@@ -99,7 +102,7 @@ namespace BulkCrapUninstaller.Functions.ApplicationList
                         : Colors.UnverifiedColor;
             }
 
-            return Color.White;
+            return ThemeManager.IsDark ? ThemeManager.Palette.Surface : Color.White;
         }
     }
 }

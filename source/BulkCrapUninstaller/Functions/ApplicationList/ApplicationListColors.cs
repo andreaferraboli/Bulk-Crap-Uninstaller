@@ -19,6 +19,26 @@ namespace BulkCrapUninstaller.Functions.ApplicationList
             Color.FromArgb(unchecked((int) 0xff5189d3)), Color.FromArgb(unchecked((int)0xff91bfdb)),
             Color.FromArgb(unchecked((int)0xfffee090)), Color.FromArgb(unchecked((int) 0xffc9dade)));
 
+        // Dark theme variants: the same hues as above, toned down to dark tints so that light text stays readable.
+
+        /// <summary>
+        /// Same meaning as <see cref="Normal"/>: green verified, blue unverified, gray invalid,
+        /// salmon unregistered, lavender Windows feature, cyan Store app.
+        /// </summary>
+        public static ApplicationListColors NormalDark = new(
+            Color.FromArgb(0x19, 0x36, 0x2A), Color.FromArgb(0x1E, 0x2E, 0x45),
+            Color.FromArgb(0x2E, 0x2E, 0x33), Color.FromArgb(0x42, 0x26, 0x24),
+            Color.FromArgb(0x35, 0x28, 0x45), Color.FromArgb(0x14, 0x3A, 0x3E));
+
+        /// <summary>
+        /// Same meaning as <see cref="ColorBlind"/>: red verified, orange unverified, blue invalid,
+        /// light blue unregistered, yellow Windows feature, gray-blue Store app.
+        /// </summary>
+        public static ApplicationListColors ColorBlindDark = new(
+            Color.FromArgb(0x6A, 0x22, 0x1E), Color.FromArgb(0x6B, 0x41, 0x2C),
+            Color.FromArgb(0x26, 0x3E, 0x62), Color.FromArgb(0x3B, 0x55, 0x66),
+            Color.FromArgb(0x5E, 0x55, 0x2E), Color.FromArgb(0x4A, 0x52, 0x55));
+
         public ApplicationListColors(Color verifiedColor, Color unverifiedColor, Color invalidColor,
             Color unregisteredColor, Color windowsFeatureColor, Color windowsStoreAppColor)
         {
